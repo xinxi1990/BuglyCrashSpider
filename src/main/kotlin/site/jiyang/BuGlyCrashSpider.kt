@@ -11,12 +11,12 @@ import site.jiyang.model.BuGlyAuthFailedResp
 import site.jiyang.model.BuGlyIssueResp
 import site.jiyang.model.Issue
 import site.jiyang.model.config.Config
-import site.jiyang.requesters.Requester
+import site.jiyang.requesters.IRequester
 
 class BuGlyCrashSpider(
     private val config: Config,
-    private val IHandler: IHandler,
-    private val requester: Requester,
+    private val handler: IHandler,
+    private val requester: IRequester,
     private val dao: IDao
 ) {
 
@@ -100,19 +100,19 @@ class BuGlyCrashSpider(
         newCount += newIssues.size
         if (newIssues.isNotEmpty()) {
             insert(newIssues)
-            IHandler.handleIssuesResp(newIssues)
+            handler.handleIssuesResp(newIssues)
         }
         nextStart += issues.size
     }
 
     private val handleAuthFailedResp: (BuGlyAuthFailedResp) -> Unit = { resp ->
         println("Handle Auth failed")
-        IHandler.handleAuthFailedResp(resp)
+        handler.handleAuthFailedResp(resp)
     }
 
     private val handleUnknownResp: (String) -> Unit = { json ->
         println("Handle unknown resp")
-        IHandler.handleUnknownResp(json)
+        handler.handleUnknownResp(json)
     }
 
     private fun insert(issues: List<Issue>) {
