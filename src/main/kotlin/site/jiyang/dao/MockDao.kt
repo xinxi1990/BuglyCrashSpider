@@ -7,12 +7,12 @@ class MockDao : IDao {
     private val mockStorage = ArrayList<String>()
 
     override fun insert(issue: Issue) {
-        mockStorage.add(issue.issueId)
+        mockStorage.add(issue.keyStack)
     }
 
-    override fun exists(issueId: String): Boolean = mockStorage.contains(issueId)
+    override fun exists(issue: Issue): Boolean = mockStorage.find { it.contains(issue.keyStack) }?.isNotEmpty() ?: false
 
     override fun insert(issues: List<Issue>) {
-        mockStorage.addAll(issues.map { it.issueId })
+        mockStorage.addAll(issues.map { it.keyStack })
     }
 }

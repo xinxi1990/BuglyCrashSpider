@@ -4,8 +4,8 @@ import com.squareup.moshi.Moshi
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import site.jiyang.model.Issue
 import site.jiyang.model.config.Config
+import site.jiyang.model.Issue as IssueModel
 
 class MySqlDaoImpl(config: Config) : IDao {
 
@@ -19,25 +19,30 @@ class MySqlDaoImpl(config: Config) : IDao {
         transaction { SchemaUtils.create(Issues) }
     }
 
-    override fun insert(issues: List<Issue>) {
+    override fun insert(issues: List<IssueModel>) {
         transaction {
             issues.forEach {
-                site.jiyang.dao.Issue.new {
+                Issue.new {
                     issueId = it.issueId
-                    json = Moshi.Builder().build().adapter(Issue::class.java).toJson(it)
+                    json = Moshi.Builder().build().adapter(IssueModel::class.java).toJson(it)
                 }
             }
         }
     }
 
-    override fun insert(issue: Issue) {
+    override fun insert(issue: IssueModel) {
         transaction {
-            site.jiyang.dao.Issue.new {
+            Issue.new {
                 issueId = issue.issueId
-                json = Moshi.Builder().build().adapter(Issue::class.java).toJson(issue)
+                json = Moshi.Builder().build().adapter(IssueModel::class.java).toJson(issue)
             }
         }
     }
 
-    override fun exists(issueId: String): Boolean = !site.jiyang.dao.Issue.find { Issues.issueId eq issueId }.empty()
+    override fun exists(issue: IssueModel): Boolean {
+        return transaction {
+            val found = Issue.find { Issues.json like "%${issue.keyStack.replace("\t", "")}%" }
+            !found.empty()
+        }
+    }
 }

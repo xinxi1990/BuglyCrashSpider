@@ -96,7 +96,7 @@ class BuGlyCrashSpider(
         allCount += issues.size
         println("Handle resp size: ${issues.size}")
 
-        val newIssues = issues.filterNot { dao.exists(it.issueId) }
+        val newIssues = issues.filterNot { dao.exists(it) }
         newCount += newIssues.size
         if (newIssues.isNotEmpty()) {
             insert(newIssues)
@@ -106,12 +106,12 @@ class BuGlyCrashSpider(
     }
 
     private val handleAuthFailedResp: (BuGlyAuthFailedResp) -> Unit = { resp ->
-        println("Handle Auth failed")
+        println("Handle Auth failed: $resp")
         handler.handleAuthFailedResp(resp)
     }
 
     private val handleUnknownResp: (String) -> Unit = { json ->
-        println("Handle unknown resp")
+        println("Handle unknown resp: $json")
         handler.handleUnknownResp(json)
     }
 

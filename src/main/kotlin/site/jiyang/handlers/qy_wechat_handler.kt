@@ -20,12 +20,16 @@ class QYWeChatHandler(qyWeChatBotConfig: QyWeChatBot, private val config: Config
     override fun handleIssuesResp(issues: List<Issue>) {
         issues.forEach {
             val markdown = QYWeChatBotMarkdown(
-                h1 = "New issue",
+                h1 = "New Crash",
                 h2 = "#${it.issueId} ${it.exceptionName}",
                 desc = it.lastestUploadTime,
                 code = it.keyStack,
                 post = it.exceptionMessage,
-                li = arrayOf(buildIssueLink(it.issueId))
+                li = arrayOf(
+                    buildIssueLink(it.issueId),
+                    "奔溃次数: ${it.crashNum}",
+                    "影响用户: ${it.imeiCount}"
+                )
             )
             botSender.send(markdown)
         }
@@ -44,7 +48,7 @@ class QYWeChatHandler(qyWeChatBotConfig: QyWeChatBot, private val config: Config
     }
 
     private fun buildIssueLink(issueId: String) =
-        "${config.buGlyHost}/crash-reporting/crashes/${config.query.appId}/$issueId?pid=${config.query.pid}"
+        "[link to](${config.buGlyHost}/crash-reporting/crashes/${config.query.appId}/$issueId?pid=${config.query.pid})"
 }
 
 //region Bot Sender
@@ -69,16 +73,14 @@ class QYWeChatBotSender(private val qyWeChatBotConfig: QyWeChatBot) {
             .post(body)
             .addHeader("Content-Type", "application/json")
             .build()
-        val response = client.newCall(request).execute()
-        println(response.code)
-        println(response.message)
-        println(response.body?.string())
+        val resp = client.newCall(request).execute()
+        println("Bot resp: ${resp.code} ${resp.message} ${resp.body?.string()}")
     }
 }
 //endregion
 
 //region Model Class
-data class QYWeChatBotMsg(val QYWeChatMarkdown: QYWeChatMarkdown, val msgtype: String = "markdown")
+data class QYWeChatBotMsg(val markdown: QYWeChatMarkdown, val msgtype: String = "markdown")
 
 data class QYWeChatMarkdown(val content: String)
 
@@ -97,7 +99,7 @@ class QYWeChatBotMarkdown(
         code?.let { append("`$it`\n") }
         post?.let { append("$it\n") }
         li.forEach {
-            append("- $it")
+            append("- $it\n")
         }
     }.toString()
 

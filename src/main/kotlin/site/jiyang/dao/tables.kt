@@ -7,7 +7,7 @@ import org.jetbrains.exposed.dao.IntIdTable
 import site.jiyang.model.Issue as IssueModel
 
 object Issues : IntIdTable() {
-    val issueId = text("issueId").index()
+    val issueId = varchar("issueId", 100).index()
     val json = text("jsonData")
 }
 

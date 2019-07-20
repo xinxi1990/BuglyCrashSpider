@@ -5,5 +5,5 @@ import site.jiyang.model.Issue
 interface IDao {
     fun insert(issues: List<Issue>)
     fun insert(issue: Issue)
-    fun exists(issueId: String): Boolean
+    fun exists(issue: Issue): Boolean
 }
