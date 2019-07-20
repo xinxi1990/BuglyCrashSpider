@@ -1,0 +1,26 @@
+{
+  "mysql": {
+    "host": "localhost:3306/test",
+    "user": "root",
+    "pass": "pass"
+  },
+  "buGlyHost": "https://bugly.qq.com/v2",
+  "auth": {
+    "token": "登录Bugly平台之后获取",
+    "cookie": "登录Bugly平台之后获取"
+  },
+  "query": {
+    "searchType": "errorType",
+    "exceptionTypeList": "Crash,Native",
+    "pid": "1",
+    "platformId": "1",
+    "sortOrder": "desc",
+    "status": "0",
+    "rows": 50,
+    "sortField": "uploadTime",
+    "appId": "Bugly上分配给App的id"
+  },
+  "qyWeChatBot": {
+    "webHook": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=<群机器人的Key>"
+  }
+}
