@@ -54,6 +54,10 @@ class QYWeChatHandler(qyWeChatBotConfig: QyWeChatBot, private val config: Config
 //region Bot Sender
 
 class QYWeChatBotSender(private val qyWeChatBotConfig: QyWeChatBot) {
+    companion object {
+        // 企业微信 20条/分钟 限制
+        private const val SEND_SLEEP_MILLIS = 60000L / 20
+    }
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(5, TimeUnit.SECONDS)
@@ -73,8 +77,10 @@ class QYWeChatBotSender(private val qyWeChatBotConfig: QyWeChatBot) {
             .post(body)
             .addHeader("Content-Type", "application/json")
             .build()
-        val resp = client.newCall(request).execute()
-        println("Bot resp: ${resp.code} ${resp.message} ${resp.body?.string()}")
+        println(client.newCall(request).execute())
+
+        println("Bot sleep $SEND_SLEEP_MILLIS millis")
+        Thread.sleep(SEND_SLEEP_MILLIS)
     }
 }
 //endregion
