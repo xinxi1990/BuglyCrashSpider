@@ -119,8 +119,8 @@ class BuGlyCrashSpider(
                 if (newIssues.isNotEmpty()) {
                     insert(newIssues)
                     handler.handleIssuesResp(newIssues)
+                    nextStart += pageSize
                 }
-                nextStart += pageSize
             }
         }
         allCount += pageSize
