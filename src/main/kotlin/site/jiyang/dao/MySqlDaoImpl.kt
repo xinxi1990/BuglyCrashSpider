@@ -1,10 +1,12 @@
 package site.jiyang.dao
 
-import com.squareup.moshi.Moshi
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import site.jiyang.model.config.Config
+import site.jiyang.toIssueModel
+import site.jiyang.toJsonString
+import site.jiyang.toTimestamp
 import site.jiyang.model.Issue as IssueModel
 
 class MySqlDaoImpl(config: Config) : IDao {
@@ -23,8 +25,9 @@ class MySqlDaoImpl(config: Config) : IDao {
         transaction {
             issues.forEach {
                 Issue.new {
+                    uploadTime = it.lastestUploadTime.toTimestamp()
                     issueId = it.issueId
-                    json = Moshi.Builder().build().adapter(IssueModel::class.java).toJson(it)
+                    json = it.toJsonString()
                 }
             }
         }
@@ -33,8 +36,9 @@ class MySqlDaoImpl(config: Config) : IDao {
     override fun insert(issue: IssueModel) {
         transaction {
             Issue.new {
+                uploadTime = issue.lastestUploadTime.toTimestamp()
                 issueId = issue.issueId
-                json = Moshi.Builder().build().adapter(IssueModel::class.java).toJson(issue)
+                json = issue.toJsonString()
             }
         }
     }
@@ -43,6 +47,12 @@ class MySqlDaoImpl(config: Config) : IDao {
         return transaction {
             val found = Issue.find { Issues.json like "%${issue.keyStack.replace("\t", "")}%" }
             !found.empty()
+        }
+    }
+
+    override fun lastUploadIssue(): IssueModel? {
+        return transaction {
+            Issue.all().sortedBy { it.uploadTime }.reversed().firstOrNull()?.toIssueModel()
         }
     }
 }

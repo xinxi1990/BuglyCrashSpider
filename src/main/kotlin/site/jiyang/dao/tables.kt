@@ -7,8 +7,9 @@ import org.jetbrains.exposed.dao.IntIdTable
 import site.jiyang.model.Issue as IssueModel
 
 object Issues : IntIdTable() {
-    val issueId = varchar("issueId", 100).index()
+    val issueId = varchar("issueId", 100)
     val json = text("jsonData")
+    val uploadTime = long("uploadTime")
 }
 
 class Issue(id: EntityID<Int>) : IntEntity(id) {
@@ -16,5 +17,6 @@ class Issue(id: EntityID<Int>) : IntEntity(id) {
 
     var issueId by Issues.issueId
     var json by Issues.json
+    var uploadTime by Issues.uploadTime
 }
 

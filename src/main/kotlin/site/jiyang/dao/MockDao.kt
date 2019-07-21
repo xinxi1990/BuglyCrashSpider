@@ -3,6 +3,7 @@ package site.jiyang.dao
 import site.jiyang.model.Issue
 
 class MockDao : IDao {
+    override fun lastUploadIssue(): Issue? = null
 
     private val mockStorage = ArrayList<String>()
 

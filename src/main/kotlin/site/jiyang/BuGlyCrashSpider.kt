@@ -12,6 +12,7 @@ import site.jiyang.model.BuGlyIssueResp
 import site.jiyang.model.Issue
 import site.jiyang.model.config.Config
 import site.jiyang.requesters.IRequester
+import java.util.*
 
 class BuGlyCrashSpider(
     private val config: Config,
@@ -19,6 +20,9 @@ class BuGlyCrashSpider(
     private val requester: IRequester,
     private val dao: IDao
 ) {
+    companion object {
+        private const val SLEEP_MILLIS = 2000L
+    }
 
     /**
      * @return "[Config.buGlyHost]]?k1=v1&k2=v2"
@@ -69,6 +73,8 @@ class BuGlyCrashSpider(
             }
 
             if (nextStart > page) {
+                println("Sleep $SLEEP_MILLIS")
+                Thread.sleep(SLEEP_MILLIS)
                 page = nextStart
                 start()
             } else {
@@ -86,6 +92,8 @@ class BuGlyCrashSpider(
                 Moshi.Builder().build().adapter(T::class.java).fromJson(json)!!.let(handler)
                 true
             } catch (ex: Exception) {
+                println("Handle exception: $ex \n${Arrays.toString(ex.stackTrace)}")
+                println("Exception resp: $json")
                 false
             }
         }
@@ -93,16 +101,25 @@ class BuGlyCrashSpider(
 
     private val handleIssueResp: (BuGlyIssueResp) -> Unit = { issueResp ->
         val issues = issueResp.ret.issueList
-        allCount += issues.size
-        println("Handle resp size: ${issues.size}")
-
-        val newIssues = issues.filterNot { dao.exists(it) }
-        newCount += newIssues.size
-        if (newIssues.isNotEmpty()) {
-            insert(newIssues)
-            handler.handleIssuesResp(newIssues)
+        val pageSize = issues.size
+        println("Handle resp size: $pageSize")
+        val lastedTime = issues.firstOrNull()?.lastestUploadTime?.toTimestamp() ?: 0L
+        val localLasted = dao.lastUploadIssue()?.lastestUploadTime?.toTimestamp() ?: 0L
+        println("LastedUpload, online: $lastedTime, local: $localLasted")
+        when {
+            issues.isEmpty() -> println("Empty issues")
+            localLasted >= lastedTime -> println("Not found new issue")
+            else -> {
+                val newIssues = issues.filterNot { dao.exists(it) }
+                newCount += newIssues.size
+                if (newIssues.isNotEmpty()) {
+                    insert(newIssues)
+                    handler.handleIssuesResp(newIssues)
+                }
+                nextStart += pageSize
+            }
         }
-        nextStart += issues.size
+        allCount += pageSize
     }
 
     private val handleAuthFailedResp: (BuGlyAuthFailedResp) -> Unit = { resp ->
