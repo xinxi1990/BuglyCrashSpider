@@ -4,6 +4,8 @@ package site.jiyang
 
 import site.jiyang.dao.IDao
 import site.jiyang.dao.MySqlDaoImpl
+import site.jiyang.filter.ExistsFilter
+import site.jiyang.filter.Filter
 import site.jiyang.handlers.IHandler
 import site.jiyang.handlers.QYWeChatHandler
 import site.jiyang.requesters.IRequester
@@ -19,8 +21,9 @@ class App {
             val handler: IHandler = QYWeChatHandler(config.qyWeChatBot, config)
             val dao: IDao = MySqlDaoImpl(config)
             val requester: IRequester = OkHttpRequester()
+            val filters: Array<Filter> = arrayOf(ExistsFilter())
             try {
-                BuGlyCrashSpider(config, handler, requester, dao).start()
+                BuGlyCrashSpider(config, handler, requester, dao, filters).start()
             } catch (e: Exception) {
                 handler.handleException(e)
             }

@@ -6,6 +6,7 @@ package site.jiyang
 
 import com.squareup.moshi.Moshi
 import site.jiyang.dao.IDao
+import site.jiyang.filter.Filter
 import site.jiyang.handlers.IHandler
 import site.jiyang.model.BuGlyAuthFailedResp
 import site.jiyang.model.BuGlyIssueResp
@@ -18,10 +19,15 @@ class BuGlyCrashSpider(
     private val config: Config,
     private val handler: IHandler,
     private val requester: IRequester,
-    private val dao: IDao
+    private val dao: IDao,
+    private val filters: Array<Filter>
 ) {
     companion object {
         private const val SLEEP_MILLIS = 2000L
+    }
+
+    init {
+        filters.forEach { it.dao = dao }
     }
 
     /**
@@ -103,14 +109,12 @@ class BuGlyCrashSpider(
         val issues = issueResp.ret.issueList
         val pageSize = issues.size
         println("Handle resp size: $pageSize")
-        val lastedTime = issues.firstOrNull()?.lastestUploadTime?.toTimestamp() ?: 0L
-        val localLasted = dao.lastUploadIssue()?.lastestUploadTime?.toTimestamp() ?: 0L
-        println("LastedUpload, online: $lastedTime, local: $localLasted")
         when {
             issues.isEmpty() -> println("Empty issues")
-            localLasted >= lastedTime -> println("Not found new issue")
             else -> {
-                val newIssues = issues.filterNot { dao.exists(it) }
+                var newIssues = issues
+                filters.forEach { newIssues = it.applyFilter(newIssues) }
+
                 newCount += newIssues.size
                 if (newIssues.isNotEmpty()) {
                     insert(newIssues)

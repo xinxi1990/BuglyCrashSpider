@@ -46,7 +46,8 @@ class MySqlDaoImpl(config: Config) : IDao {
     override fun exists(issue: IssueModel): Boolean {
         return transaction {
             val found = Issue.find { Issues.json like "%${issue.keyStack.replace("\t", "")}%" }
-            !found.empty()
+                .filter { it.issueId != issue.issueId }
+            found.isNotEmpty()
         }
     }
 
