@@ -13,7 +13,25 @@
 
 ## 使用方法
 
-### 运行时传递配置文件路径
+### 使用 jar
+
+#### 使用默认实现 
+
+https://github.com/stefanJi/BuglyCrashSpider/releases
+
+#### 自己打包:
+
+```
+./gradle clean build
+```
+
+再运行:
+
+```
+java -jar build/libs/BuglyCrashSpider.jar "config.json"
+```
+
+### 通过 gradle 执行
 
 ```
 ./gradlew run --args "config.json"
