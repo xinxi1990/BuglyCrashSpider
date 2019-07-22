@@ -27,7 +27,7 @@ class QYWeChatHandler(qyWeChatBotConfig: QyWeChatBot, private val config: Config
                 post = it.exceptionMessage,
                 li = arrayOf(
                     buildIssueLink(it.issueId),
-                    "奔溃次数: ${it.crashNum}",
+                    "崩溃次数: ${it.crashNum}",
                     "影响用户: ${it.imeiCount}"
                 )
             )
@@ -48,7 +48,7 @@ class QYWeChatHandler(qyWeChatBotConfig: QyWeChatBot, private val config: Config
     }
 
     private fun buildIssueLink(issueId: String) =
-        "[link to](${config.buGlyHost}/crash-reporting/crashes/${config.query.appId}/$issueId?pid=${config.query.pid})"
+        "[Link To](${config.buGlyHost}/crash-reporting/crashes/${config.query.appId}/$issueId?pid=${config.query.pid})"
 }
 
 //region Bot Sender
