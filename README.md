@@ -31,6 +31,14 @@ https://github.com/stefanJi/BuglyCrashSpider/releases
 java -jar build/libs/BuglyCrashSpider.jar "config.json"
 ```
 
+#### 定时执行
+
+> 例如: 使用 Crontab
+
+```
+*/5 * * * * java -jar BuglyCrashSpider.jar config.json >/tmp/bugly_crash_spider.log 2>/tmp/bugly_crash_spider_stderr.log
+```
+
 ### 通过 gradle 执行
 
 ```
