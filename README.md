@@ -114,7 +114,7 @@ java -jar build/libs/BuglyCrashSpider.jar "config.json"
 - `IHandler` 报警处理, 现已提供 `QYWeChatHandler` 发送消息到企业微信群机器人
 - `IDao` 数据持久化, 现已提供 `MySqlDaoImpl` 持久化到 MySQL
 - `IRequester` 模拟请求 Bugly 接口, 现已提供 `OkHttpRequester` 通过 OkHttp 模拟请求
-- `Filter` 过滤策略, 现已提供 `ExistsFilter`, 过滤类似的异常堆栈
+- `Filter` 过滤策略, 现已提供 `ExistsFilter`: 过滤类似的异常堆栈; `NumberFilter`: 过滤发生次数
 
 ```kotlin
 class App {
